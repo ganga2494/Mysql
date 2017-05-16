@@ -1,0 +1,12 @@
+answers of olympic table
+1)count of people in each country
+select country,count(Distinct name) from olympic1 group by country;
+2)number of countries 
+select count(Distinct country) from olympic1;
+3)no of participates in each game
+select activity,count(activity) from olympic1 group by activity;
+4)total number of games 
+select count(Distinct activity) from olympic1;
+5)monthwise total no of partcipants
+select odate,count(activity) from olympic1 group by odate;
+
