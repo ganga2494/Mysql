@@ -10,7 +10,15 @@ ans.select * from customer where rating=100;
 ans.select * from customer where city='null'; ::displays empty set.
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 4. Find the largest order taken by each salesperson on each date.
-ans. select a.onum,max(a.amt),a.odate,a.cnum,b.snum from orders a,customer b where a.cnum=b.cnum group by b,snum,a.odate;
+ans. select onum,amt,odate,cnum,snum,sname 
+	from orders
+	join salespeople
+	using (snum)
+	where amt in (select max(amt) 
+			from orders
+			group by snum, odate
+			)
+		order by odate, snum;
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 5. Arrange the Orders table by descending customer number.
 ans. select * from orders order by cnum desc;
@@ -68,7 +76,7 @@ ans: select * from rating order by rating;
 21. Find all customers whose CNUM is 1000 above the SNUM of Serres.
 ans: select a.cnum,a.cname,b.snum,b.sname from customer a,salespeople b where b.snum+1000=a.cnum;
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-22. Give the salespeople’s commissions as percentages instead of decimal numbers.
+22. Give the salespeopleâ€™s commissions as percentages instead of decimal numbers.
 ans. select sname,comm*100 as comm from salespeople;
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 23. Find the largest order taken by each salesperson on each date, eliminating those MAX orders
@@ -88,7 +96,7 @@ ans: select * from customer where rating>200;
 ans: select a.sname,c.onum from salespeople a, customer b,orders c where a.snum=b.snum and b.cnum=c.cnum group by a.sname;
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 28. Write a query that produces all customers serviced by salespeople with a commission above
-    12%. Output the customer’s name and the salesperson’s rate of commission.
+    12%. Output the customerâ€™s name and the salespersonâ€™s rate of commission.
 ans: select a.cname,b.sname,b.comm from customer a,salespeople b where a.snum=b.snum and b.comm>'0.12';
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
 29. Find salespeople who have multiple customers.
@@ -97,7 +105,7 @@ ans:  select a.sname,b.cname from salespeople a,customer b where a.snum=b.snum l
 30. Find salespeople with customers located in their city.
 ans: select a.sname,a.city,b.cname from salespeople a,customer b where a.city=b.city;
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
-31. Find all salespeople whose name starts with ‘P’ and the fourth character is ‘l’.
+31. Find all salespeople whose name starts with â€˜Pâ€™ and the fourth character is â€˜lâ€™.
 ans: select * from salespeople where sname like 'p__l';
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 32. Write a query that uses a subquery to obtain all orders for the customer named Cisneros.
@@ -110,7 +118,7 @@ ans: select a.sname,max(c.amt) as amt from salespeople a,customer b,orders c whe
 34. Extract the Salespeople table in the following order : SNUM, SNAME, COMMISSION, CITY.
 ans: select snum,sname,comm,city from salespeople:
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-35. Select all customers whose names fall in between ‘A’ and ‘G’ alphabetical range.
+35. Select all customers whose names fall in between â€˜Aâ€™ and â€˜Gâ€™ alphabetical range.
 ans: select a.sname,b.cname from salespeople a, customer b where sname and cname like 'a%g';
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 36. Select all the possible combinations of customers that you can assign.
@@ -139,11 +147,11 @@ ans: select a.cname,b.amt from customer a,orders b where a.cnum=b.cnum and amt>(
 43. Write a query that selects the highest rating in each city.
 ans: select city,max(rating) as rating from customer group by city;
 
-44. Write a query that calculates the amount of the salesperson’s commission on each order by a
+44. Write a query that calculates the amount of the salespersonâ€™s commission on each order by a
 customer with a rating above 100.00.
 ans: select a.amt,a.cnum,b.rating,b.snum,c.sname,c.comm,a.amt*c.comm from orders a,customer b,salespeople c where a.cnum=b.cnum and b.snum=c.snum and b.rating>100;
 
-45. Count the customers with ratings above San Jose’s average.
+45. Count the customers with ratings above San Joseâ€™s average.
 ans: select * from customer where rating>(select avg(rating) from customer where city='san jose';
 
 46. Write a query that produces all pairs of salespeople with themselves as well as duplicate rows
@@ -173,7 +181,7 @@ is more elegant?
 q:- select a.sname,a.snum,b.city from orders a left outer join customer b on a.snum=b.snum;
 ------------------------------------------------------------------------------------------------------------------
 53. Write a query that selects all customers whose ratings are equal to or greater than ANY (in the
-SQL sense) of Serres’?
+SQL sense) of Serresâ€™?
 q:- select a.sname,b.rating from salespeople a,customer b where a.snum=b.snum;
     select * from customers where rating>=200;
 -------------------------------------------------------------------------------------------------------------------
@@ -206,11 +214,11 @@ ans:- select * from orders;
 the latter alphabetically, and the latter has a rating of less than 200.
 ans:- select a.sname,b.cname,b.rating from salespeople a,customer b where a.snum=b.snum and b.rating>200;
 ---------------------------------------------------------------------------------------------------------------------------------------------
-62. List all Salespeople’s names and the Commission they have earned.
+62. List all Salespeopleâ€™s names and the Commission they have earned.
 ans:- select a.sname,sum(a.comm*c.amt) as commision from sales people a,customer b,orders c where a.snum=b.snum and b.cnum=c.cnum group ny a.comm;
 ---------------------------------------------------------------------------------------------------------------------------------------------------------
 63. Write a query that produces the names and cities of all customers with the same rating as
-Hoffman. Write the query using Hoffman’s CNUM rather than his rating, so that it would still be
+Hoffman. Write the query using Hoffmanâ€™s CNUM rather than his rating, so that it would still be
 usable if his rating changed.
 ans:- select cname,city from customer where rating=(select rating from customer where cnum='2001');
 -------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -267,7 +275,7 @@ ans:- select e.sname,d.count_cus from salespeople e,(select count(c.onum) as cou
 salesperson who currently has at least one other customer (besides the customer being
 selected) with orders in the Orders table.
 ans:- select e.sname,d.count_cus from salespeople e,(select count(c.onum) as count_cus from salespeople a,customer b,orders c where a.snum=b.snum and b.cnum=c.cnum group by a.sname) d where e.sname=d.sname and count_cus>1;
-79. Write a query that selects all customers whose names begin with ‘C’.
+79. Write a query that selects all customers whose names begin with â€˜Câ€™.
 ans:- select * from customer where cname like 'c%';
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 80. Write a query on the Customers table that will find the highest rating in each city. Put the output
@@ -279,7 +287,7 @@ Orders table (without any repeats).
 ans:- select b.snum,b.sname,c.onum from customer a,salespeople b,orders c where a.snum=b.snum and a.cnum=c.cnum group by b.snum;
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 82. Write a query that lists customers in descending order of rating. Output the rating field first,
-followed by the customer’s names and numbers.
+followed by the customerâ€™s names and numbers.
 ans:- select rating,cname,cnum from customer order by rating desc;
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 83. Find the average commission for salespeople in London.
@@ -301,7 +309,7 @@ where (amt < 1000 OR NOT (odate = 10/03/1996 AND cnum >
 2003));
 ans:- table 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-88. Write a query that selects each customer’s smallest order.
+88. Write a query that selects each customerâ€™s smallest order.
 ans:- select a.cnum,a.cname,min(b.amt) from customer a,orders b where a.cnum=b.cnum group by a.cname order by min(b.amt);
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 89. Write a query that selects the first customer in alphabetical order whose name begins with G.
@@ -394,7 +402,7 @@ ans:- select odate,avg(amt) from orders where odate!='1996-04-10' group by odate
 114.Which customers have above average orders?
 ans:- select * from orders where amt> (select avg(amt)from oreders);
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
-115.List all customers with ratings above San Jose’s average.
+115.List all customers with ratings above San Joseâ€™s average.
 ans:- select cnum,rating from customer where rating>(select avg(rating) from customer where city='sanjose');
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 116.Select the total amount in orders for each salesperson for whom the total is greater than the
@@ -405,10 +413,10 @@ ans:- select b.sname,c.onum,sum(c.amt) from customer a,salespeople b,orders c wh
 ans:- select sname,snum from salespeople where snum in(select snum from customer group by snum having count(snum)>1);
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 118.Select all salespersons by name and number who have customers in their city whom they
-don’t service.
+donâ€™t service.
 ans:- select a.sname,a.city,b.cname,b.city as cus_city from salespeople a,customer b where a.snum=b.snum and a.city!=b.city;
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
-119.Which customers’ rating should be lowered?
+119.Which customersâ€™ rating should be lowered?
 ans:- select a.cnum,b.cname,b.rating,sum(a.amt) as totalspend from orders a,customer b where a.cnum=b.cnum group by cnum order by totalspend;
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 120.Is there a case for assigning a salesperson to Berlin?
